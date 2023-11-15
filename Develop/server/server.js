@@ -12,7 +12,6 @@ const app = express();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => ({ user: req.user }),
 });
 
 
@@ -22,16 +21,12 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
-  app.use(authMiddleware);
-
-  app.use('/graphql', expressMiddleware(server));
-
-  // if (process.env.NODE_ENV === 'production') {
-  //   app.use(express.static(path.join(__dirname, '../client/build')));
-  // }
+  app.use('/graphql', expressMiddleware(server), {
+    context: authMiddleware
+  });
 
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
+    app.use(express.static(path.join(__dirname, '../client/build')));
 
     app.get('*', (req, res) => {
       res.sendFile(path.join(__dirname, '../client/dist/index.html'));
