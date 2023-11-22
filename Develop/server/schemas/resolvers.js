@@ -53,8 +53,8 @@ const resolvers = {
 
             const user = await User.findByIdAndUpdate(
                 context.user._id,
-                { $push: { savedBooks: input } },
-                { new: true }
+                { $addToSet: { savedBooks: input } },
+                { runValidators: true, new: true }
             );
 
             return user
@@ -70,6 +70,10 @@ const resolvers = {
                 { $pull: { savedBooks: { bookId } } },
                 { new: true }
             );
+
+            if (!user) {
+                throw new Error("Couldn't find user with this id!")
+            }
 
             return user
         }
