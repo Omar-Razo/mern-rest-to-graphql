@@ -1,10 +1,9 @@
-const { Book, User } = require('../models');
+const { User } = require('../models');
 const { signToken, AuthenticationError } = require('../utils/auth');
 
 const resolvers = {
     Query: {
         me: async (parent, args, context) => {
-
             if (!context.user) {
                 throw new Error('Authentication required');
             }
@@ -41,8 +40,8 @@ const resolvers = {
 
             const user = await User.create(args)
 
-            const token = signToken({ email, _id })
-            
+            const token = signToken(user)
+
             return { token, user }
         },
         saveBook: async (parent, { input }, context) => {
@@ -53,8 +52,8 @@ const resolvers = {
 
             const user = await User.findByIdAndUpdate(
                 context.user._id,
-                { $push: { savedBooks: input } },
-                { new: true }
+                { $addToSet: { savedBooks: input } },
+                { runValidators: true, new: true }
             );
 
             return user
@@ -70,6 +69,10 @@ const resolvers = {
                 { $pull: { savedBooks: { bookId } } },
                 { new: true }
             );
+
+            if (!user) {
+                throw new Error("Couldn't find user with this id!")
+            }
 
             return user
         }
