@@ -59,7 +59,7 @@ Screenshot of the website in use:
 
 The latest version of the webpage is active at:
 
-
+https://graphql-booksearch-engine-ffbd7ddff84b.herokuapp.com/
 
 ## Installation
 
